@@ -2,7 +2,7 @@
 
 __author__ = "Torrance Graham"
 __email__ = "torrance.m.graham@gmail.com"
-__version__ = "0.2"
+__version__ = "0.2.5"
 __status__ ="Production"
 
 '''
@@ -103,28 +103,25 @@ def display_table_contents(arcClass, cw, path= env.workspace):
     try:
         cursor = arcpy.da.SearchCursor(full_path, field_Names)
 
-    except TypeError:
-        #testing area for tomorrow
-        print("field names for " + arcClass + ": ")
-        for x in range(len(field_Names)):
-            print(field_Names[x])
-
-        newField_Names = map(str, field_Names)
-        cursor = arcpy.da.SearchCursor(full_path, newField_Names)
-
-    for row in cursor:
+        for row in cursor:
         
-        updated_row = [display_path]
-        # Removes return commands from values in row
-        for index in row:
-            if type(index) == str:
-                index = index.replace('\r', '')
-                index = index.replace('\n', '')
-                updated_row.append(index)
-            else:
-                updated_row.append(index)
-                
-        cw.writerow(updated_row)
+            updated_row = [display_path]
+            
+            # Removes return commands from values in row
+            for index in row:
+                if type(index) == str:
+                    index = index.replace('\r', '')
+                    index = index.replace('\n', '')
+                    updated_row.append(index)
+                else:
+                    updated_row.append(index)
+
+            cw.writerow(updated_row)
+
+    except TypeError:
+        
+        # Display Tables returns TypeError when Field_Names is empty
+        print("Error with field_Names for " + arcClass)
 #-----------------------------------------------
 
 
@@ -152,11 +149,11 @@ def write_to_csv(outputFile):
         cw.writerow("")
 
         display_datasets(datasets, cw)
-
+        
         cw.writerow("")
         cw.writerow(["FEATURE CLASSES THAT ARENT IN A DATASET"])
         display_feature_classes(featureClasses, cw)
-   
+        
         cw.writerow("")
         
         display_tables(tables, cw)
